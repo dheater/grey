@@ -1,0 +1,24 @@
+{
+  "name": "grey",
+  "version": "0.0.1",
+  "bin": {
+    "grey": "./dist/grey.mjs"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "jest",
+    "start": "node dist/grey.mjs"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.6.0",
+    "esbuild": "^0.28.0",
+    "jest": "^30.5.2",
+    "prettier": "^3.8.3",
+    "ts-jest": "^30.0.0",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "0.3.289"
+  }
+}
