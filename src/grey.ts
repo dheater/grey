@@ -6,4 +6,3 @@ if (args.includes("--version")) {
   console.log(GREY_VERSION);
   process.exit(0);
 }
-
