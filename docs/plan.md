@@ -49,15 +49,16 @@ Running `grey` in a workspace starts one read-only Claude session. Every message
 - Run `npm install`.
 - Check: `just build` emits `dist/grey.mjs`, and `node dist/grey.mjs --version` prints the version.
 
-1.2 **`src/session.ts`.**
-- `buildQueryOptions({ workspaceRoot, modelId, persona, effort })`:
+1.2 **`src/models.ts`, `src/options.ts`, `src/recorder.ts` and `src/session.ts`.** Imports run one way: `models` ← `options` ← `recorder` ← `session`. Nothing imports `session`.
+- `src/models.ts`: `EFFORT_LEVELS`, `EffortLevel`, `isEffortLevel`, `BEDROCK_MODEL_IDS`, `ModelAlias`, `isModelAlias`. It imports nothing local.
+- `src/options.ts` (imports `./models`): `MAX_TURNS`, `READ_TOOLS` and `buildQueryOptions({{ workspaceRoot, modelId, persona, effort })`:
   - `tools` and `allowedTools` are `["Read", "Glob", "Grep"]`.
   - `permissionMode: "dontAsk"`.
   - Carry over `maxTurns` and the Bedrock `env` block (`../carl/src/claude-runner.ts:96-105`). Leave out the budget cap, as listed under Dropped from carl.
   - No `sandbox` key.
-- `RunRecorder(modelId, onProgress, onToolCall, baseline?)`: copy `../carl/src/claude-runner.ts:211-362`. When summing usage, subtract `baseline[model]` from each `modelUsage[model]`. Expose `resultModelUsage()` so the next turn can take it as its baseline.
-- `describeFailure`: the max-turns message says "End grey and start a new session" instead of "Split the request" (`:366-369`). Drop the budget message.
-- `class Session`:
+- `src/recorder.ts` (imports `MAX_TURNS` from `./options`): the usage types, the SDK message shapes, `describeFailure` and the other helpers, and `RunRecorder(modelId, onProgress, onToolCall, baseline?)`. Copy `../carl/src/claude-runner.ts:211-362`. When summing usage, subtract `baseline[model]` from each `modelUsage[model]`. Expose `resultModelUsage()` so the next turn can take it as its baseline.
+- `describeFailure` (in `recorder.ts`): the max-turns message says "End grey and start a new session" instead of "Split the request" (`:366-369`). Drop the budget message.
+- `src/session.ts` (imports `./models`, `./options` and `./recorder`): `Inbox`, `UserMessage`, `AgentRunError`, `attachUsage`, `SessionOptions` and `class Session`:
   - The constructor takes `{ workspaceRoot, model, effort, persona, query? }`. It starts `query({ prompt: inbox, options })` once, as in `../carl/src/mentor.ts:92-103`.
   - `send(message, { onProgress, onToolCall }): Promise<{ text, usage }>` pushes the message to the inbox.
   - It reads messages until the next `result`, feeding each into a fresh `RunRecorder` built on the stored baseline and the current model id.
@@ -66,7 +67,7 @@ Running `grey` in a workspace starts one read-only Claude session. Every message
   - `setEffort(level)` calls `query.applyFlagSettings({ effortLevel })`, with `null` for `default`, and stores the level.
   - Both run between turns: after one `result` and before the next `inbox.push`.
   - `close()` closes the inbox and the query.
-- Check: the `session.test.ts` tests pass.
+- Check: the `session.test.ts`, `options.test.ts` and `recorder.test.ts` tests pass.
 
 1.3 **`src/editor.ts`.**
 - `SCISSORS = "# ------------------------ >8 ------------------------"`.
@@ -160,11 +161,13 @@ Running `grey` in a workspace starts one read-only Claude session. Every message
   - the nvim recipe from the Risks section.
 
 ## Tests
+- `src/options.test.ts`:
+  - `buildQueryOptions` offers exactly `Read`, `Glob` and `Grep`, sets `persistSession: false` and `settingSources: []`, and has no `Bash`, `Edit` or `Write`;
+  - `buildQueryOptions` has no `maxBudgetUsd`.
+- `src/recorder.test.ts`:
+  - `RunRecorder` subtracts its baseline per model.
 - `src/session.test.ts`:
   - `Inbox` tests, copied from `../carl/src/mentor.test.ts`;
-  - `buildQueryOptions` offers exactly `Read`, `Glob` and `Grep`, sets `persistSession: false` and `settingSources: []`, and has no `Bash`, `Edit` or `Write`;
-  - `buildQueryOptions` has no `maxBudgetUsd`;
-  - `RunRecorder` subtracts its baseline per model;
   - with a fake `query`, two `send` calls report per-turn tokens, not running totals;
   - two turns on two models report per-turn usage for each;
   - a failed result throws `AgentRunError` carrying that turn's usage;
@@ -228,12 +231,15 @@ Running `grey` in a workspace starts one read-only Claude session. Every message
 ## Files
 `../carl/...` marks carl source to copy from. `carl` is another agent harness that serves as inspiration for `grey`.
 
-- `src/session.ts`: `Inbox` (`../carl/src/mentor.ts:43-82`), `buildQueryOptions`, `RunRecorder` with a baseline, `describeFailure`, `oneLine`, `BEDROCK_MODEL_IDS`, `isPoisonedSession`, and the new `class Session` with `send`, `setModel(alias)`, `setEffort(level)` and `close`. `Session` holds the current model id and passes it to each turn's `RunRecorder`.
+- `src/models.ts`: `EFFORT_LEVELS`, `EffortLevel`, `isEffortLevel`, `BEDROCK_MODEL_IDS`, `ModelAlias`, `isModelAlias`. `cost.ts` and `grey.ts` import from it.
+- `src/options.ts`: `buildQueryOptions`, `MAX_TURNS`, `READ_TOOLS`.
+- `src/recorder.ts`: `RunRecorder` with a baseline, the usage and SDK message types, `describeFailure`, `oneLine`.
+- `src/session.ts`: `Inbox` (`../carl/src/mentor.ts:43-82`), `AgentRunError`, `isPoisonedSession`, and the new `class Session` with `send`, `setModel(alias)`, `setEffort(level)` and `close`. `Session` holds the current model id and passes it to each turn's `RunRecorder`.
 - `src/editor.ts`: `splitCommand`, `getEditorCommand`, `isInteractive` (`../carl/src/editor.ts:6-63`), plus new `editTurn`, `buildTurnFile` and `parseTurnFile`.
 - `src/prompt.ts`: `loadRules`, `loadSkill`, `listSkills`, `buildPersona(workspaceRoot)`, `buildTurnMessage`, `Attachments`.
 - `src/events.ts`: `getConfigDir`, `EVENTS_LOG_FILE`, `INVOCATION_ID`, `writeEvent`, and the `TimingEvent` and meta types.
-- `src/cost.ts`: `MODEL_RATES`, `RATES_FINGERPRINT`, `computeCost` (`../carl/src/skill.ts:574-659`), and `formatStatus`.
+- `src/cost.ts`: `MODEL_RATES` (keyed on the ids in `models.ts`), `RATES_FINGERPRINT`, `computeCost` (`../carl/src/skill.ts:574-659`), and `formatStatus`.
 - `src/vcs.ts`: copy `../carl/src/git.ts` and drop `detectGit` if nothing calls it.
 - `src/loop.ts`: `parseDirectives`, `runTurn` and `runSession`, the editor loop.
-- `src/grey.ts`: `main`, `usage`, flag parsing (`--model`, `--effort`, `--version`).
+- `src/grey.ts`: `main`, `usage`, flag parsing (`--model`, `--effort`, `--version`), which imports `isModelAlias` and `isEffortLevel` from `models.ts`.
 

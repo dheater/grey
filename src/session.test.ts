@@ -2,15 +2,11 @@ import type { query as sdkQuery } from "@anthropic-ai/claude-agent-sdk" with {
   "resolution-mode": "import",
 };
 
-import {
-  AgentRunError,
-  BEDROCK_MODEL_IDS,
-  Inbox,
-  RunRecorder,
-  Session,
-  buildQueryOptions,
-  type SdkMessage,
-} from "./session";
+import { Inbox, Session } from "./session";
+import { type SdkMessage } from "./recorder";
+
+import { BEDROCK_MODEL_IDS, EffortLevel, ModelAlias } from "./models";
+import { buildQueryOptions } from "./options";
 
 const SONNET = BEDROCK_MODEL_IDS["sonnet5.5"];
 const OPUS = BEDROCK_MODEL_IDS["opus5.5"];
@@ -20,6 +16,7 @@ const READ_TOOLS = ["Read", "Glob", "Grep"];
 function content(result: IteratorResult<{ message: { content: string } }>) {
   return result.done ? "done" : result.value.message.content;
 }
+
 type Usage = {
   inputTokens?: number;
   outputTokens?: number;
@@ -35,25 +32,6 @@ function assistant(id: string, input: number, output: number): SdkMessage {
       content: [{ type: "text", text: "working" }],
       usage: { input_tokens: input, output_tokens: output },
     },
-  };
-}
-
-function success(text: string, modelUsage: Record<string, Usage>): SdkMessage {
-  return {
-    type: "result",
-    subtype: "success",
-    is_error: false,
-    result: text,
-    modelUsage,
-  };
-}
-
-function failure(modelUsage: Record<string, Usage>): SdkMessage {
-  return {
-    type: "result",
-    subtype: "error_max_turns",
-    is_error: true,
-    modelUsage,
   };
 }
 
@@ -154,49 +132,30 @@ describe("Inbox", () => {
     expect(content(await it.next())).toBe("last");
     expect((await it.next()).done).toBe(true);
   });
-
-  describe("buildQueryOptions", () => {
-    const options = buildQueryOptions({
-      workspaceRoot: "/work",
-      modelId: SONNET,
-      effort: "default",
-      persona: "persona",
-    });
-
-    test("offers only read-only and keeps no session state", () => {
-      expect(options.tools).toEqual(READ_TOOLS);
-      expect(options.allowedTools).toEqual(READ_TOOLS);
-      expect(options).toMatchObject({
-        persistSession: false,
-        settingSources: [],
-        settings: { includeGitInstructions: false },
-        permissionMode: "dontAsk",
-      });
-      expect(options).not.toHaveProperty("sandbox");
-    });
-
-    test("sets no budget cap", () => {
-      expect(options).not.toHaveProperty("maxDudgetUsd");
-    });
-  });
 });
 
-describe("runRocorder", () => {
-  test("subtracts its baseloine per model", () => {
-    const recorder = new RunRecorder(OPUS, undefined, undefined, {
-      [SONNET]: { inputTokens: 100, outputTokens: 10 },
-      [OPUS]: { inputTokens: 20, outputTokens: 2 },
+describe("buildQueryOptions", () => {
+  const options = buildQueryOptions({
+    workspaceRoot: "/work",
+    modelId: SONNET,
+    effort: "default",
+    persona: "persona",
+  });
+
+  test("offers only read-only and keeps no session state", () => {
+    expect(options.tools).toEqual(READ_TOOLS);
+    expect(options.allowedTools).toEqual(READ_TOOLS);
+    expect(options).toMatchObject({
+      persistSession: false,
+      settingSources: [],
+      settings: { includeGitInstructions: false },
+      permissionMode: "dontAsk",
     });
-    const totals = {
-      [SONNET]: { inputTokens: 130, outputTokens: 14 },
-      [OPUS]: { inputTokens: 50, outputTokens: 5 },
-    };
-    recorder.record(success("ok", totals));
-    expect(recorder.usage()).toMatchObject({
-      inputTokens: 60,
-      outputTokens: 7,
-    });
-    expect(recorder.resultModelUsage()).toEqual(totals);
+    expect(options).not.toHaveProperty("sandbox");
+  });
+
+  test("sets no budget cap", () => {
+    expect(options).not.toHaveProperty("maxBudgetUsd");
   });
 });
 
@@ -310,3 +269,22 @@ describe("Session", () => {
     expect(calls.close).toBe(1);
   });
 });
+
+function success(text: string, modelUsage: Record<string, Usage>): SdkMessage {
+  return {
+    type: "result",
+    subtype: "success",
+    is_error: false,
+    result: text,
+    modelUsage,
+  };
+}
+
+function failure(modelUsage: Record<string, Usage>): SdkMessage {
+  return {
+    type: "result",
+    subtype: "error_max_turns",
+    is_error: true,
+    modelUsage,
+  };
+}
