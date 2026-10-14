@@ -3,8 +3,8 @@
   "packages": [
     "just@latest",
     "git@latest",
-    "typescript-language-server@latest",
-    "nodejs@latest",
-    "jujutsu@latest"
+    "jujutsu@latest",
+    "stylua@latest",
+    "selene@latest"
   ]
 }

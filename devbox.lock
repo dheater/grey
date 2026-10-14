@@ -166,90 +166,89 @@
         }
       }
     },
-    "nodejs@latest": {
-      "last_modified": "2026-10-07T09:43:42Z",
-      "plugin_version": "0.0.5",
-      "resolved": "github:NixOS/nixpkgs/39ad350a0602fa0a58a544344e3e9187526ea45c#nodejs_26",
+    "selene@latest": {
+      "last_modified": "2026-10-08T19:21:32Z",
+      "resolved": "github:NixOS/nixpkgs/8edc0c72e3a38faf5434e40d1f19431125fe4b30#selene",
       "source": "devbox-search",
-      "version": "26.10.0",
+      "version": "0.32.0",
       "systems": {
         "aarch64-darwin": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/c9xqn5rlbnvbxxcvx9saqarablxalvx9-nodejs-26.10.0",
+              "path": "/nix/store/3gs2ywv6qqjl1dkcd8a4shsx4rg5s7xn-selene-0.32.0",
               "default": true
             }
           ],
-          "store_path": "/nix/store/c9xqn5rlbnvbxxcvx9saqarablxalvx9-nodejs-26.10.0"
+          "store_path": "/nix/store/3gs2ywv6qqjl1dkcd8a4shsx4rg5s7xn-selene-0.32.0"
         },
         "aarch64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/hll7rrhj7iif7k6zn5015bxzhs6vykzg-nodejs-26.10.0",
+              "path": "/nix/store/f27584n5j1d4w9rsn56msdyd1i1i150p-selene-0.32.0",
               "default": true
             }
           ],
-          "store_path": "/nix/store/hll7rrhj7iif7k6zn5015bxzhs6vykzg-nodejs-26.10.0"
+          "store_path": "/nix/store/f27584n5j1d4w9rsn56msdyd1i1i150p-selene-0.32.0"
         },
         "x86_64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/b9kyvc9jb7hd97bzp4xhfqqp5ldkga04-nodejs-26.10.0",
+              "path": "/nix/store/hq2d2pc2m0lnzdi4qlvsim3kx8r0pb35-selene-0.32.0",
               "default": true
             }
           ],
-          "store_path": "/nix/store/b9kyvc9jb7hd97bzp4xhfqqp5ldkga04-nodejs-26.10.0"
+          "store_path": "/nix/store/hq2d2pc2m0lnzdi4qlvsim3kx8r0pb35-selene-0.32.0"
         }
       }
     },
-    "typescript-language-server@latest": {
-      "last_modified": "2026-10-07T09:43:42Z",
-      "resolved": "github:NixOS/nixpkgs/39ad350a0602fa0a58a544344e3e9187526ea45c#typescript-language-server",
+    "stylua@latest": {
+      "last_modified": "2026-10-08T19:21:32Z",
+      "resolved": "github:NixOS/nixpkgs/8edc0c72e3a38faf5434e40d1f19431125fe4b30#stylua",
       "source": "devbox-search",
-      "version": "5.3.0",
+      "version": "2.5.2",
       "systems": {
         "aarch64-darwin": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/f5m3bm9zf3q14w963g61dvgyqj1knyjs-typescript-language-server-5.3.0",
+              "path": "/nix/store/d89xrl0yla2ld5nzxbcdc0npavy2x9xs-stylua-2.5.2",
               "default": true
             }
           ],
-          "store_path": "/nix/store/f5m3bm9zf3q14w963g61dvgyqj1knyjs-typescript-language-server-5.3.0"
+          "store_path": "/nix/store/d89xrl0yla2ld5nzxbcdc0npavy2x9xs-stylua-2.5.2"
         },
         "aarch64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/q0d46id9qmm0p3ars55dvzgbvp6i2ma2-typescript-language-server-5.3.0",
+              "path": "/nix/store/xsyah3xv0nh1bvs362q5zqpknpz7p0iy-stylua-2.5.2",
               "default": true
             }
           ],
-          "store_path": "/nix/store/q0d46id9qmm0p3ars55dvzgbvp6i2ma2-typescript-language-server-5.3.0"
+          "store_path": "/nix/store/xsyah3xv0nh1bvs362q5zqpknpz7p0iy-stylua-2.5.2"
         },
         "x86_64-darwin": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/6w64xys9f3hdihnh91lgq60l67jgzw8p-typescript-language-server-5.3.0",
+              "path": "/nix/store/0xbr4l6lvpcqcvs8rcm2ww1wwl1izbp3-stylua-2.5.2",
               "default": true
             }
           ],
-          "store_path": "/nix/store/6w64xys9f3hdihnh91lgq60l67jgzw8p-typescript-language-server-5.3.0"
+          "store_path": "/nix/store/0xbr4l6lvpcqcvs8rcm2ww1wwl1izbp3-stylua-2.5.2"
         },
         "x86_64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/sxmkhjp6pvp9nki4x48ixr3lpa3dc8xk-typescript-language-server-5.3.0",
+              "path": "/nix/store/gsg4drf4f41pwgsnay0l44fq1lybx4k5-stylua-2.5.2",
               "default": true
             }
           ],
-          "store_path": "/nix/store/sxmkhjp6pvp9nki4x48ixr3lpa3dc8xk-typescript-language-server-5.3.0"
+          "store_path": "/nix/store/gsg4drf4f41pwgsnay0l44fq1lybx4k5-stylua-2.5.2"
         }
       }
     }
