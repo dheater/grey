@@ -25,7 +25,7 @@
   claude -p --input-format stream-json --output-format stream-json --verbose
     --tools Read,Glob,Grep --allowed-tools Read,Glob,Grep
     --permission-mode dontAsk --restricted
-    --setting-sources "" --no-session-persistence
+    --setting-sources "project"
     --settings '{"includeGitInstructions":false}'
     --system-prompt <persona> --model <bedrock id> [--effort <level>]
   ```
@@ -105,15 +105,6 @@ The repo root is the plugin. Add it to the runtimepath, for example lazy.nvim's 
 - `plugin/grey.lua`, which defines the commands and calls `ui`
 
 ### Milestone 1: mentor, checkpoints and plan
-
-1.2 **`tests/run.lua` and the justfile.**
-- The runner prepends the repo to `runtimepath` and loads every `tests/*_spec.lua`. Each spec returns a table of name to function.
-- It runs each test with `pcall`, prints the failures, and calls `os.exit(1)` if any failed.
-- `just test` runs `nvim --headless -u NONE -l tests/run.lua`.
-
-1.3 **`grey.models` and `grey.options`.**
-- `models`: `BEDROCK_MODEL_IDS`, `EFFORT_LEVELS`, `is_model_alias` and `is_effort_level`, ported from `src/models.ts`.
-- `options`: `READ_TOOLS`, `build_argv({ model_id, effort, persona })` with the flags above, and `build_env()`.
 
 1.4 **`grey.recorder`.** Port `RunRecorder` (`src/recorder.ts:97-267`) and its helpers (`:269-330`):
 - `Recorder.new(model_id, baseline, on_tool_call)`, with `record(msg)`, `usage(latency_ms)`, `outcome()` and `result_model_usage()`;

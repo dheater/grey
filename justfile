@@ -1,10 +1,10 @@
 build:
 
 format:
-    stylua
+    stylua lua tests
 
 lint:
-    selene tests
+    selene lua tests
 
 test:
     nvim --headless -u NONE -l tests/run.lua
