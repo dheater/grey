@@ -39,7 +39,6 @@ function M.build_argv(opts)
 		opts.model_id,
 	}
 
-	assert(opts.effort)
 	if opts.effort ~= "default" then
 		vim.list_extend(argv, { "--effort", opts.effort })
 	end
